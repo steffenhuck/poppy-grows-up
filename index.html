@@ -120,7 +120,7 @@
     <div class="hero"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#poppyFace"/></svg></div>
     <h1>Poppy Grows Up</h1>
     <p class="dedication">For <b>Poppy</b>. And for <b>Nala</b>.</p>
-    <p class="small">Treats, the bell, the tricks, the vet, the rug, the sofa, the monkey. And a sister.</p>
+    <p class="small">Treats, the bell, the tricks, the vet, the rug, the sofa, the monkey. A sister. And the small one.</p>
     <button class="btn" id="againBtn">▶ Watch again</button>
   </div>
   <footer><a href="https://steffenhuck.github.io/">steffen huck</a></footer>
@@ -770,6 +770,41 @@
         no = {x: lerp(400 + Math.sin((30.5-23.8)*1.9 - .7)*270, 470, k2), y: 388, s: .97, dir: -1, legA: walkLegs(t, k2 < 1), legsOff: lie >= 1, lift: lie * 22, head: lie >= 1 ? 20 : 0, tail: lie >= 1 ? 12 : wag(t, 18, 10), shut: t > 35};
       }
       pose(this.p, po); pose(this.n, no);
+    }
+  });
+
+  // 7. the small one
+  SCENES.push({
+    chap: 'Me', dur: 24, dusk: true, bg: () => roomBG() + sofaSVG(makeCushions()) + `<g transform="translate(${SHELF.mx} ${SHELF.y}) scale(.95)">${monkeySVG(4, true)}</g>
+      <defs><radialGradient id="warm"><stop offset="0" stop-color="#ffe2a8" stop-opacity=".75"/><stop offset="1" stop-color="#ffe2a8" stop-opacity="0"/></radialGradient></defs>
+      <rect width="800" height="420" fill="#1c1838" opacity=".52"/>
+      <circle cx="664" cy="196" r="110" fill="url(#warm)" opacity=".55"/><circle cx="745" cy="290" r="90" fill="url(#warm)" opacity="0" id="hallGlow"/>`,
+    caps: [[1.2, 'At night, when everyone is asleep, she sometimes comes back.'], [9, 'The small one. Me.'], [16, 'We sleep better like that.']],
+    music: [[0, () => { chord([48, 55, 64], {dur: 7, vol: .04, attack: 2}); line(HALF_B, {when: .8, step: .7, vol: .045, type: 'sine', last: 3}); }],
+            [7.5, () => { chord([41, 53, 57, 64], {dur: 7, vol: .04, attack: 2}); line(GROW_1, {when: .4, step: .6, vol: .04, type: 'sine', shift: 12, last: 3}); }],
+            [14.5, () => { chord([43, 55, 59, 62], {dur: 3.5, vol: .04, attack: 1.5}); line([79, 77, 76, 74], {when: .3, step: .7, vol: .04, type: 'sine'}); }],
+            [17.5, () => { line(HALF_B, {step: .62, vol: .05, type: 'sine', last: 4}); chord([36, 48, 55, 60, 64, 67, 72], {when: 3.6, dur: 6, vol: .055, strum: .07, attack: .8}); }]],
+    setup(){
+      this.p = makeDog(L.act);
+      const g = document.createElementNS(NS, 'g'); L.act.appendChild(g);
+      g.innerHTML = `<circle id="pupGlow" r="46" fill="url(#warm)"/>`;
+      const gf = document.createElementNS(NS, 'g'); gf.setAttribute('filter', 'url(#sepia)'); g.appendChild(gf);
+      this.pup = makeDog(gf);
+      this.glowG = g;
+    },
+    tick(t){
+      const br = Math.sin(t * 1.5) * 1.4;
+      const look = seg(t, 8, 9.2) * (1 - seg(t, 13, 14.5));
+      pose(this.p, {x: BED_X + 10, y: 390, s: .98, legsOff: true, lift: 22 + br, head: lerp(20, -4, look) + (t > 14.5 ? 6 : 0), tail: look > .5 ? wag(t, 12, 6) : 12, shut: !(t > 8 && t < 15)});
+      const glow = seg(t, 3.5, 4.5) * (1 - seg(t, 10, 12));
+      $('hallGlow').setAttribute('opacity', (glow * .9).toFixed(2));
+      const k = ease(seg(t, 5, 11)), lie = seg(t, 11, 12.4);
+      const px = lerp(770, 196, k);
+      $('pupGlow').setAttribute('cx', px); $('pupGlow').setAttribute('cy', 380); $('pupGlow').setAttribute('opacity', (seg(t, 4, 5) * .8).toFixed(2));
+      pose(this.pup, {x: px, y: 398, s: .44, headK: 1.35, dir: -1, legA: walkLegs(t, k > 0 && k < 1, 14),
+        legsOff: lie >= 1, lift: lie * 22 + (lie >= 1 ? -br * .5 : 0), head: lie >= 1 ? 22 : (k >= 1 ? -12 : 0), tail: lie >= 1 ? 10 : wag(t, 18, 12), shut: t > 13.5,
+        alpha: seg(t, 4, 5)});
+      this.glowG.setAttribute('opacity', (.9 * (1 - seg(t, 21, 23.5))).toFixed(2));
     }
   });
 
