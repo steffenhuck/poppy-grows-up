@@ -567,6 +567,7 @@
     chap: 'Where to go', dur: 25, bg: () => roomBG(),
     caps: [[.8, 'When I need to go, I ring the bell.'], [8.5, 'I didn\'t always know where. Nobody could tell me. They just waited.'], [15.5, 'And when I got it right: a treat. Right away. Every time.']],
     music: [[0, () => { chord([48, 55, 64], {dur: 3.8, vol: .045}); line(GROW_1, {step: .48, vol: .05, type: 'sine'}); }],
+            [5.2, () => SFX.ding()],
             [8.4, () => { chord([45, 52, 60], {dur: 3, vol: .045}); line(HALF_B, {step: .55, vol: .05}); }],
             [14.2, () => chord([48, 55, 64, 72], {dur: 2.6, vol: .035, attack: .7})],
             [16, () => { chord([41, 53, 57, 60], {dur: 3, vol: .045}); chord([43, 55, 59, 62], {when: 2.5, dur: 2.5, vol: .045}); line(GROW_2, {step: .5, vol: .05, type: 'sine'}); }],
@@ -732,7 +733,7 @@
   // 6. Nala
   SCENES.push({
     chap: 'Nala', dur: 38, dusk: true, bg: () => gardenBG(true),
-    caps: [[1, 'Before all this, there was someone else.'], [7.5, 'Same day, same litter, same basket. Then she went to another house.'], [15.5, 'A car. The gate.'], [20.5, 'Nala.'], [29, 'Some things you don\'t grow out of.']],
+    caps: [[1, 'Before all this, there was someone else.'], [7.5, 'Same day, same litter, same basket. Then she went to another house.'], [15.5, 'And then, one evening…'], [20.5, 'Nala.'], [29, 'Some things you don\'t grow out of.']],
     music: [[.5, () => { chord([45, 52, 57, 60], {dur: 7, vol: .04, attack: 2}); line(HALF_A, {when: .6, step: .62, vol: .045, type: 'sine', last: 2.6}); }],
             [7.4, () => { chord([41, 48, 53, 57], {dur: 7, vol: .04, attack: 2}); line(HALF_A, {when: .6, step: .7, vol: .04, type: 'sine', last: 3, shift: 12}); }],
             // together, the song is whole
