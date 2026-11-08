@@ -499,8 +499,18 @@
     caps: [[.8, 'I\'m big now. Everyone says so.'], [6.5, 'But some days I remember being small.']],
     music: [[0, () => { chord([48, 55, 64, 72], {dur: 6, vol: .05, attack: 1.5}); line(HALF_B, {when: .8, step: .62, vol: .05, type: 'sine'}); }],
             [6.5, () => { chord([41, 53, 57, 64], {dur: 6, vol: .05, attack: 1.5}); line([76, 74, 72, 71, 72], {when: .4, step: .7, vol: .045, type: 'sine', last: 3}); }]],
-    setup(){ this.p = makeDog(L.act); },
+    setup(){
+      this.p = makeDog(L.act);
+      memAt(440, 14, 430, 300);
+      L.memC.innerHTML = `<rect width="340" height="190" fill="#9ed17a"/><rect y="150" width="340" height="40" fill="#86c463"/>
+        <ellipse cx="120" cy="158" rx="44" ry="10" fill="#8b5a2b"/><ellipse cx="120" cy="154" rx="38" ry="7" fill="#f4c7c3"/>`;
+      this.pup = makeDog(L.memC);
+    },
     tick(t){
+      memShow(t, 6.2, 12.8);
+      const pk = ease(seg(t, 7.4, 9.4));
+      pose(this.pup, {x: lerp(120, 200, pk), y: 162, s: .42, headK: 1.35, legA: walkLegs(t, pk > 0 && pk < 1, 16),
+        sit: pk >= 1, body: pk >= 1 ? -16 : 0, head: pk >= 1 ? -14 + Math.sin(t*3)*10 : 0, tail: wag(t, 26, 20), legsOff: t < 7.4, lift: t < 7.4 ? 22 : 0, shut: t < 7});
       const up = seg(t, 6, 7.2);
       pose(this.p, {x: 400, y: 384, s: 1.05, legsOff: up < 1, lift: lerp(22, 0, up), head: lerp(20, -6, up), tail: wag(t, 18, 5), shut: t < 5.5});
       if (up >= 1) pose(this.p, {x: 400, y: 384, s: 1.05, head: -6 + Math.sin(t*1.5)*3, tail: wag(t, 22, 9), sit: true, body: -18});
@@ -514,13 +524,13 @@
     music: [[0, () => { chord([48, 55, 64], {dur: 3.4, vol: .05}); line(GROW_1, {step: .38, vol: .06}); }],
             [3.4, () => { chord([41, 53, 57], {dur: 1.7, vol: .05}); chord([43, 55, 59, 62], {when: 1.6, dur: 1.8, vol: .05}); line(GROW_2, {step: .38, vol: .06}); }],
             [8.4, () => { chord([48, 55, 64], {dur: 3, vol: .045}); line([72, 74, 76, 77, 79, 81, 83, 84], {step: .52, vol: .05, type: 'sine'}); }],
-            [13.3, () => SFX.good()],
+            [13.3, () => chord([48, 55, 64, 72], {dur: 2.6, vol: .035, attack: .7})],
             [16.2, () => { line(GROW_1, {step: .38, vol: .055, shift: 12}); chord([48, 55, 64, 67], {dur: 3.4, vol: .05}); }],
             [19.8, () => { line(GROW_2, {step: .38, vol: .055, shift: 12}); chord([41, 53, 57], {dur: 1.6, vol: .05}); chord([43, 55, 59], {when: 1.6, dur: 1.6, vol: .05}); chord([48, 55, 64], {when: 3.1, dur: 2.5, vol: .05}); }],
-            [21.5, () => SFX.sniff()], [23.2, () => SFX.yip()]],
+            ],
     setup(){
       this.p = makeDog(L.act);
-      L.prop.innerHTML = `<g id="treatNow" opacity="0" transform="translate(520 380) scale(.32)"><use href="#bone" transform="translate(-50 -36)"/></g>`;
+      L.prop.innerHTML = `<g id="treatNow" opacity="0" transform="translate(546 393) scale(.34)"><use href="#bone" transform="translate(-50 -36)"/></g>`;
       memAt(440, 14, 330, 290);
       // memory: little Poppy on the hot-and-cold squares
       const cols = ['#6ea8e6','#8fd3e0','#ffe27a','#ffb35a','#ff6b4a'];
@@ -539,9 +549,10 @@
       const k = ease(seg(t, 17, 21.5)), walking = t > 17 && t < 21.5;
       const x = t < 17 ? 150 : lerp(150, 470, k);
       const found = t > 22.8;
-      pose(this.p, {x, y: 384, s: 1.05, legA: walkLegs(t, walking), head: t < 17 ? -4 + Math.sin(t)*3 : 28 + Math.sin(t*14)*4, tail: wag(t, found ? 30 : 14, found ? 22 : 8), sit: t < 16 && t > 2, body: t < 16 && t > 2 ? -16 : 0});
-      $('treatNow').setAttribute('opacity', t > 21.5 && t < 22.8 ? 1 : 0);
-      this.p.mk.innerHTML = found ? `<g transform="translate(14 -2) scale(.5)"><use href="#bone" transform="translate(-50 -36)"/></g>` : '';
+      const nose = t > 21.4 && t < 22.8;
+      pose(this.p, {x, y: 384, s: 1.05, legA: walkLegs(t, walking), head: t < 17 ? -4 + Math.sin(t)*3 : nose ? 46 + Math.sin(t*16)*3 : 28 + Math.sin(t*14)*4, tail: wag(t, found ? 30 : 14, found ? 22 : 8), sit: t < 16 && t > 2, body: t < 16 && t > 2 ? -16 : 0});
+      $('treatNow').setAttribute('opacity', t > 20.5 && t < 22.8 ? 1 : 0);
+      if (this._found !== found){ this._found = found; this.p.mk.innerHTML = found ? `<g transform="translate(88 -74) rotate(-12) scale(.42)"><use href="#bone" transform="translate(-50 -36)"/></g>` : ''; }
       // memory
       memShow(t, 7.5, 16.5);
       const mk = seg(t, 8.5, 13.2), col = mk * 6.3, px = 40 + mk * 250;
@@ -556,11 +567,8 @@
     chap: 'Where to go', dur: 25, bg: () => roomBG(),
     caps: [[.8, 'When I need to go, I ring the bell.'], [8.5, 'I didn\'t always know where. Nobody could tell me. They just waited.'], [15.5, 'And when I got it right: a treat. Right away. Every time.']],
     music: [[0, () => { chord([48, 55, 64], {dur: 3.8, vol: .045}); line(GROW_1, {step: .48, vol: .05, type: 'sine'}); }],
-            [5.4, () => SFX.ding()],
-            [7, () => SFX.door()],
             [8.4, () => { chord([45, 52, 60], {dur: 3, vol: .045}); line(HALF_B, {step: .55, vol: .05}); }],
-            [12, () => SFX.plop()],
-            [14.2, () => SFX.good()],
+            [14.2, () => chord([48, 55, 64, 72], {dur: 2.6, vol: .035, attack: .7})],
             [16, () => { chord([41, 53, 57, 60], {dur: 3, vol: .045}); chord([43, 55, 59, 62], {when: 2.5, dur: 2.5, vol: .045}); line(GROW_2, {step: .5, vol: .05, type: 'sine'}); }],
             [21, () => { chord([48, 55, 64, 72], {dur: 4, vol: .05}); }]],
     setup(){
@@ -605,10 +613,9 @@
             [9, () => { line([79, 81, 83, 84], {step: .14, vol: .06}); chord([48, 55, 64, 72], {when: .5, dur: 2.4, vol: .06}); }],
             [0, () => chord([43, 50, 59], {dur: 9, vol: .035, attack: 2})],
             [11.5, () => { chord([43, 55, 59], {dur: 3, vol: .045}); line(GROW_1, {step: .3, vol: .05, shift: 7}); }],
-            [15, () => SFX.meh()],
             [16.5, () => { chord([48, 52, 55], {dur: 2.5, vol: .045}); line([72, 71, 69, 67], {step: .45, vol: .05, type: 'sine'}); }],
             [19, () => { chord([48, 55, 64], {dur: 3, vol: .05}); line(GROW_2, {step: .34, vol: .055}); }],
-            [22.2, () => { chord([48, 55, 64, 67, 72], {dur: 3, vol: .05, strum: .05}); SFX.yip(); }]],
+            [22.2, () => { chord([48, 55, 64, 67, 72], {dur: 3, vol: .045, strum: .05, attack: .5}); }]],
     setup(){
       this.p = makeDog(L.act);
       memAt(440, 14, 420, 270);
@@ -639,7 +646,6 @@
     chap: 'The vet', dur: 25, bg: () => gardenBG(false),
     caps: [[1, 'The vet smelled of other dogs, and of being afraid.'], [8.5, 'I slept. When I woke up, someone was still there.'], [16.5, 'There\'s a line down my back now. They touch it very carefully.']],
     music: [[0, () => { chord([45, 52, 57, 60], {dur: 8, vol: .05, attack: 2}); line([76, 74, 72, 71, 69], {when: 1, step: .85, vol: .045, type: 'sine', last: 3}); }],
-            [4.5, () => SFX.heart()], [5.6, () => SFX.heart()], [6.7, () => SFX.heart()],
             [8.3, () => { chord([41, 48, 53, 57], {dur: 7, vol: .05, attack: 2}); line(HALF_B, {when: .6, step: .7, vol: .05, type: 'sine'}); }],
             [16, () => { chord([48, 55, 60, 64], {dur: 9, vol: .05, attack: 2}); line(GROW_1, {when: .8, step: .62, vol: .045, type: 'sine', last: 3}); }]],
     setup(){
@@ -689,9 +695,8 @@
     music: [[0, () => { line([48, 50, 52, 54, 56, 54, 52, 50], {step: .28, vol: .06, type: 'triangle', hold: .8}); chord([48, 54, 62], {dur: 2.3, vol: .04}); }],
             [2.3, () => { line([50, 52, 54, 56, 58, 56, 54, 52], {step: .28, vol: .06, type: 'triangle', hold: .8}); chord([50, 56, 64], {dur: 2.3, vol: .04}); }],
             [4.6, () => { line([48, 50, 52, 54, 56, 54, 52, 50], {step: .28, vol: .06, type: 'triangle', hold: .8}); chord([44, 52, 60, 66], {dur: 2.3, vol: .04}); }],
-            [9.3, () => { line([72, 74, 76, 78, 80, 82, 84, 86], {step: .12, vol: .05}); chord([48, 54, 64, 70], {when: 1, dur: 2, vol: .05}); }],
-            [11, () => SFX.tear()], [11.8, () => SFX.tear()],
-            [13, () => { SFX.door(); chord([47, 50, 53, 56], {dur: 2.4, vol: .07, attack: .02, bend: -2, cutoff: 1400}); }],
+            [9.3, () => { line([72, 74, 76, 78, 80, 82, 84, 86], {step: .24, vol: .04, type: 'sine'}); chord([48, 54, 64, 70], {when: 1, dur: 2, vol: .05}); }],
+            [13, () => chord([47, 50, 53, 57], {dur: 3.4, vol: .04, attack: .9})],
             [17.8, () => { chord([45, 52, 57, 62], {dur: 5, vol: .045, attack: 1.5}); line([77, 76, 74, 72, 74, 78], {when: .6, step: .6, vol: .05, type: 'sine', last: 3}); }],
             [23.2, () => chord([50, 54, 57, 60, 64], {dur: 4, vol: .04, attack: 1.5})]],
     setup(){
@@ -730,7 +735,6 @@
     caps: [[1, 'Before all this, there was someone else.'], [7.5, 'Same day, same litter, same basket. Then she went to another house.'], [15.5, 'A car. The gate.'], [20.5, 'Nala.'], [29, 'Some things you don\'t grow out of.']],
     music: [[.5, () => { chord([45, 52, 57, 60], {dur: 7, vol: .04, attack: 2}); line(HALF_A, {when: .6, step: .62, vol: .045, type: 'sine', last: 2.6}); }],
             [7.4, () => { chord([41, 48, 53, 57], {dur: 7, vol: .04, attack: 2}); line(HALF_A, {when: .6, step: .7, vol: .04, type: 'sine', last: 3, shift: 12}); }],
-            [15.2, () => SFX.car()], [17.4, () => SFX.gate()], [19.4, () => SFX.yip()],
             // together, the song is whole
             [20.6, () => { const st = .46, Lh = HALF_A.length * st;
                 line(HALF_A, {step: st, vol: .08, type: 'sine', last: st*1.7}); line(HALF_B, {when: Lh, step: st, vol: .08, type: 'sine', last: 2.6});
